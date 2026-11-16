@@ -1,0 +1,47 @@
+# 本地系统和编辑器文件
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# 本地环境、密钥和依赖
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+
+# 数据只保留目录占位文件
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+
+# 运行产物，不影响 results 中整理好的图表
+/runs/
+/logs/
+/checkpoints/
+/artifacts/
+/cache/
+*.log
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.pickle
+*.joblib
+
+# 构建和本地临时文件
+/build/
+/dist/
+/tmp/
