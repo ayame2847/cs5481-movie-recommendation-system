@@ -1,0 +1,5 @@
+dataset,n_rows,n_cols
+ratings,1000209,4
+users,6040,5
+movies,3883,3
+comparison,1000209,10

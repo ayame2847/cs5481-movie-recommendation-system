@@ -4,12 +4,13 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 
 ## 目前进度
 
-目前先整理项目文档和目录，还没有实现数据处理、算法训练、评估或展示页面。算法、开发语言、软件环境和展示方式都还没确定；确定后再补充依赖文件和运行命令。
+- **已完成（A：数据部分）**：数据集信息提取、EDA 可视化、清洗与特征编码、统一 leave-one-out 划分，全部脚本已跑通并通过校验，结果见 `results/`，报告草稿见 `reports/A_data_report.md`。
+- **待做**：三个算法（课堂 MF / 参考 BPR / 近期 LRURec）训练调参、统一评估（Recall@10、NDCG@10）、推荐结果对比、展示界面、最终报告与 5 分钟展示。
 
 ## 要做什么
 
-- 了解数据：查看用户、电影和评分数据，统计数据量、缺失值、字段类型和分布。
-- 处理数据：整理特征，固定训练集、验证集和测试集的划分，避免把验证和测试信息用进训练。
+- 了解数据：查看用户、电影和评分数据，统计数据量、缺失值、字段类型和分布。✅
+- 处理数据：整理特征，固定训练集、验证集和测试集的划分，避免把验证和测试信息用进训练。✅
 - 比较算法：按课程要求选 **正好三个算法**，分别来自课堂内容、指定参考算法和指定近期算法。
 - 给出推荐：针对选定用户，每种算法推荐至少 5 部不在已观察评分历史中的电影，展示片名和类型，并比较结果。
 - 完成展示：用网页、移动端、Notebook 或等效交互界面接收用户或示例档案，展示推荐。
@@ -21,60 +22,74 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 ```text
 .
 ├── README.md                 # 项目介绍和使用入口
-├── .gitignore                # 不提交的数据、模型和本地文件
-├── .gitattributes            # 统一文本换行
-├── configs/                  # 确定技术方案后，放实验配置
-├── data/                     # 本地原始数据和处理后的数据
-│   ├── raw/
-│   └── processed/
+├── requirements.txt          # Python 依赖
+├── configs/config.yaml       # 全局配置：种子 42、正例阈值 4、路径
+├── data/
+│   └── processed/            # 划分与特征文件（本地生成，不入库）
 ├── docs/                     # 课程要求、协作约定、实验记录模板
+├── ml-1m/                    # 原始数据（本地，不入库）
 ├── notebooks/                # 数据探索和临时实验
 ├── src/                      # 数据处理、推荐算法、评估和展示代码
-├── results/                  # 可以用于报告的结果表和图
-│   ├── tables/
-│   └── figures/
+│   ├── config.py             # 配置加载
+│   ├── load_data.py          # 原始数据加载与编码表
+│   ├── dataset_info.py       # 任务一：数据集信息提取
+│   ├── eda.py                # 任务二上：EDA 图与统计
+│   └── preprocess.py         # 任务二下：清洗、编码、划分、校验
+├── results/                  # 结果表和图
+│   ├── tables/               # 01–09 结果表
+│   └── figures/              # fig01–fig06
 └── reports/                  # 技术报告和展示材料
+    └── A_data_report.md      # A 部分报告草稿（数据信息 + 探索预处理）
 ```
-
-各目录的 README 说明了放什么。代码还没开始，不提前拆很多空模块；等实现时再按职责细分。
 
 ## 怎么开始
 
-1. 克隆仓库并进入项目目录：
+1. 克隆仓库并进入项目目录（私有仓库，需要访问权限）：
 
    ```bash
    git clone https://github.com/ayame2847/cs5481-movie-recommendation-system.git
    cd cs5481-movie-recommendation-system
    ```
 
-   这是私有仓库，克隆前需要有访问权限。
+2. 从 [GroupLens 官方页面](https://grouplens.org/datasets/movielens/1m/) 下载 MovieLens 1M，解压为项目根目录下的 `ml-1m/`（或修改 `configs/config.yaml` 的 `raw_dir`）。原始数据不提交仓库。
 
-2. 阅读 [课程要求](docs/课程要求.md) 和 [协作约定](docs/协作约定.md)，先确定三个算法和技术方案。
-3. 从 [GroupLens 官方页面](https://grouplens.org/datasets/movielens/1m/) 获取 MovieLens 1M，按 [数据说明](data/README.md) 放到本地，并阅读压缩包中的 README。
-4. 开发前在 [实验记录](docs/实验记录模板.md) 中写清数据划分、相关性标签和评价方法。
+3. 安装依赖并复现 A 部分全部结果：
+
+   ```bash
+   pip install -r requirements.txt
+   python src/dataset_info.py   # 数据集信息 + comparison dataset
+   python src/eda.py            # EDA 图与统计
+   python src/preprocess.py     # 清洗、编码、leave-one-out 划分与校验
+   ```
 
 ## 软件环境和运行方法
 
-尚未确定，当前没有可执行入口，也没有依赖安装、训练、评估或展示命令。
+- 语言：Python 3（已在 Windows + Python 3.x 实际跑通上述三条命令）。
+- 依赖：`requirements.txt`（pandas / numpy / matplotlib / pyyaml）。
+- 输入：`ml-1m/` 下三个 `.dat` 文件；输出：`results/tables/`、`results/figures/`、`data/processed/`。
+- 算法训练、评估与展示命令待对应模块实现后补充。
 
-代码实现后，需要在这里补全：语言和版本、依赖安装方法、数据预处理、三个算法的训练与评估命令、展示启动方法。每条命令应注明输入、输出和必要配置，并在新环境中实际跑通。
+## 统一实验口径（三个算法必须共用）
+
+- **相关性标签**：Rating ≥ 4 → 正例（label=1），正例占比 57.52%；train 文件同时保留原始评分供显式模型使用。
+- **划分**：leave-one-out，按用户正例时间排序，最后一次正例 → test（6,038 行）、倒数第二次 → val（6,037 行）、其余 → train（988,134 行）。
+- **防泄漏**：行为统计特征仅用 train 计算（示例：`train_item_popularity.csv`）；评估 val 过滤 train 已观察电影，评估 test 过滤 train+val；最终展示推荐过滤全部已观察电影；调参只用 val。
+- **评估指标**：Recall@10、NDCG@10，全量候选排序（评估脚本实现时固定候选集合并记录）。
+- 详细论证见 `reports/A_data_report.md`。
 
 ## 随机种子和实验复现
 
-随机种子尚未确定。开始实验时应记录种子及其生效位置，包括数据划分、负采样和模型初始化；同时保留数据版本、配置、软件版本和代码提交编号。若存在无法完全复现的环节，也要写清楚。
-
-三个算法的比较口径确定后统一记录，不能只改参数就当作另一个算法。调参使用验证集，测试集留到最终评估。
+全局随机种子 **42**（`configs/config.yaml`）。当前数据划分按时间确定性执行，无随机性；种子供后续负采样、模型初始化与数据抽样使用，使用时需在实验记录中注明生效位置。数据版本：MovieLens 1M 官方 stable 包（ratings 1,000,209 行）。
 
 ## 结果在哪
 
-- 结果表：[`results/tables/`](results/tables/)
-- 结果图：[`results/figures/`](results/figures/)
-- 技术报告和展示材料：[`reports/`](reports/)
-
-目前没有实验结果；这些目录只有占位文件。不要把计划做的实验写成已经完成，也不要把示例数值当成真实结果。
+- 结果表：[`results/tables/`](results/tables/)（01–06 数据集信息表、07 EDA 摘要、08 清洗对比、09 划分统计）
+- 结果图：[`results/figures/`](results/figures/)（评分分布、用户活跃度、电影长尾、时间趋势、类型、人口统计）
+- A 部分报告草稿：[`reports/A_data_report.md`](reports/A_data_report.md)
+- 算法评估结果与推荐对比：待实验后补充，不把计划当结果。
 
 ## 数据来源与引用
 
 数据来源：F. Maxwell Harper and Joseph A. Konstan. 2015. *The MovieLens Datasets: History and Context*. ACM Transactions on Interactive Intelligent Systems, 5(4), Article 19. [https://doi.org/10.1145/2827872](https://doi.org/10.1145/2827872)
 
-数据页面：[MovieLens 1M](https://grouplens.org/datasets/movielens/1m/)。下载后还需按数据包中的 README 核对使用条款和引用要求。原始数据不随本仓库提交或再分发。采用论文和第三方实现后，在报告中补充对应引用及修改说明。
+数据页面：[MovieLens 1M](https://grouplens.org/datasets/movielens/1m/)。原始数据不随本仓库提交或再分发。采用论文和第三方实现后，在报告中补充对应引用及修改说明。

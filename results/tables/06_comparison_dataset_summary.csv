@@ -1,0 +1,5 @@
+dataset,n_rows,n_cols,total_nulls,memory_mb,description
+ratings,1000209,4,0,32.01,原始评分表 UserID::MovieID::Rating::Timestamp
+users,6040,5,0,0.77,原始用户表 UserID::Gender::Age::Occupation::Zip-code
+movies,3883,3,0,0.55,原始电影表 MovieID::Title::Genres
+comparison,1000209,10,0,288.33,合并对比数据集 ratings ⋈ users ⋈ movies（全量分析视图）

@@ -1,0 +1,23 @@
+# CS5481 Group Project — MovieLens 1M
+# 全局实验配置：所有模块共用，修改后需重跑对应脚本。
+
+seed: 42                 # 全局随机种子（划分按时间确定性进行；种子供后续抽样/模型使用）
+
+paths:
+  raw_dir: ml-1m                 # 原始数据目录（不提交仓库）
+  processed_dir: data/processed  # 预处理与划分输出
+  tables_dir: results/tables     # 结果表
+  figures_dir: results/figures   # 结果图
+  reports_dir: reports           # 报告
+
+labels:
+  positive_threshold: 4  # Rating >= 4 记为正例（relevance = 1）
+
+split:
+  method: leave-one-out  # 每用户按时间排序：最后一次正例 -> test，倒数第二次 -> val
+  # 其余全部评分记录（含低分）进入 train，供显式/隐式模型各自使用
+
+files:
+  ratings: ratings.dat
+  users: users.dat
+  movies: movies.dat

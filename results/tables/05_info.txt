@@ -1,0 +1,82 @@
+===== ratings =====
+<class 'pandas.DataFrame'>
+RangeIndex: 1000209 entries, 0 to 1000208
+Data columns (total 4 columns):
+ #   Column     Non-Null Count    Dtype
+---  ------     --------------    -----
+ 0   UserID     1000209 non-null  int64
+ 1   MovieID    1000209 non-null  int64
+ 2   Rating     1000209 non-null  int64
+ 3   Timestamp  1000209 non-null  int64
+dtypes: int64(4)
+memory usage: 30.5 MB
+
+--- ratings: head(3) ---
+   UserID  MovieID  Rating  Timestamp
+0       1     1193       5  978300760
+1       1      661       3  978302109
+2       1      914       3  978301968
+
+===== users =====
+<class 'pandas.DataFrame'>
+RangeIndex: 6040 entries, 0 to 6039
+Data columns (total 5 columns):
+ #   Column      Non-Null Count  Dtype
+---  ------      --------------  -----
+ 0   UserID      6040 non-null   int64
+ 1   Gender      6040 non-null   str  
+ 2   Age         6040 non-null   int64
+ 3   Occupation  6040 non-null   int64
+ 4   Zip-code    6040 non-null   str  
+dtypes: int64(3), str(2)
+memory usage: 236.1 KB
+
+--- users: head(3) ---
+   UserID Gender  Age  Occupation Zip-code
+0       1      F    1          10    48067
+1       2      M   56          16    70072
+2       3      M   25          15    55117
+
+===== movies =====
+<class 'pandas.DataFrame'>
+RangeIndex: 3883 entries, 0 to 3882
+Data columns (total 3 columns):
+ #   Column   Non-Null Count  Dtype
+---  ------   --------------  -----
+ 0   MovieID  3883 non-null   int64
+ 1   Title    3883 non-null   str  
+ 2   Genres   3883 non-null   str  
+dtypes: int64(1), str(2)
+memory usage: 91.1 KB
+
+--- movies: head(3) ---
+   MovieID                    Title                        Genres
+0        1         Toy Story (1995)   Animation|Children's|Comedy
+1        2           Jumanji (1995)  Adventure|Children's|Fantasy
+2        3  Grumpier Old Men (1995)                Comedy|Romance
+
+===== comparison =====
+<class 'pandas.DataFrame'>
+RangeIndex: 1000209 entries, 0 to 1000208
+Data columns (total 10 columns):
+ #   Column      Non-Null Count    Dtype
+---  ------      --------------    -----
+ 0   UserID      1000209 non-null  int64
+ 1   MovieID     1000209 non-null  int64
+ 2   Rating      1000209 non-null  int64
+ 3   Timestamp   1000209 non-null  int64
+ 4   Gender      1000209 non-null  str  
+ 5   Age         1000209 non-null  int64
+ 6   Occupation  1000209 non-null  int64
+ 7   Zip-code    1000209 non-null  str  
+ 8   Title       1000209 non-null  str  
+ 9   Genres      1000209 non-null  str  
+dtypes: int64(6), str(4)
+memory usage: 76.3 MB
+
+--- comparison: head(3) ---
+   UserID  MovieID  Rating  Timestamp Gender  Age  Occupation Zip-code                                   Title                        Genres
+0       1     1193       5  978300760      F    1          10    48067  One Flew Over the Cuckoo's Nest (1975)                         Drama
+1       1      661       3  978302109      F    1          10    48067        James and the Giant Peach (1996)  Animation|Children's|Musical
+2       1      914       3  978301968      F    1          10    48067                     My Fair Lady (1964)               Musical|Romance
+

@@ -1,0 +1,6 @@
+step,rows_before,rows_after,rows_removed,note
+drop_duplicate_user_movie,1000209,1000209,0,同一用户对同一电影保留时间戳最新的一条
+drop_invalid_rating,1000209,1000209,0,评分必须为 1-5 整数
+drop_invalid_timestamp,1000209,1000209,0,时间戳必须为正
+drop_unmatched_user,1000209,1000209,0,剔除无法关联用户表的评分
+drop_unmatched_movie,1000209,1000209,0,剔除无法关联电影表的评分（保证推荐可展示片名/类型）

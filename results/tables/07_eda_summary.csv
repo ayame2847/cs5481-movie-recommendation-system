@@ -1,0 +1,18 @@
+metric,value,description_zh
+n_users,6040,评分用户数
+n_movies_total,3883,电影总数
+n_movies_rated,3706,有评分记录的电影数
+n_ratings,1000209,评分总数
+rating_mean,3.5816,评分均值
+rating_median,4.0,评分中位数
+positive_ratio(>=4),0.5752,正例（评分>=4）占比
+user_item_sparsity,0.957353,用户-电影矩阵稀疏度
+ratings_per_user_mean,165.6,每用户平均评分数
+ratings_per_user_median,96.0,每用户评分数中位数
+ratings_per_user_min,20,每用户最少评分数
+ratings_per_user_max,2314,每用户最多评分数
+ratings_per_item_mean,269.89,每电影平均评分数
+ratings_per_item_median,123.5,每电影评分数中位数
+ratings_per_item_max,3428,每电影最多评分数
+first_rating_time,2000-04-25 23:05:32,最早评分时间
+last_rating_time,2003-02-28 17:49:50,最晚评分时间
