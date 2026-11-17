@@ -1,0 +1,57 @@
+{
+  "seed": 42,
+  "official_commit": "e02a559bd8c42342f5c53d69cefea2589becb22c",
+  "model_sha256": "149e0ccfe03c7eba7a51bf405d179f8a3f395011c0f730169aec2b59c9c156b1",
+  "runner_sha256": "ce21f14273542f0853302c35ed4b054dca4caec80d20ea1340836a32d2306445",
+  "python": "3.13.16",
+  "torch": "2.14.1+cu130",
+  "numpy": "2.4.6",
+  "pandas": "2.2.3",
+  "gpu": "Tesla T4",
+  "configuration": {
+    "project": "/content/cs5481_project/cs5481-movie-recommendation-system-main",
+    "official": "/content/LRURec_project",
+    "output": "/content/CS5481_LRURec/run_1794930764979407342",
+    "epochs": 50,
+    "patience": 10,
+    "batch_size": 128,
+    "eval_batch_size": 128,
+    "max_len": 200,
+    "smoke": false,
+    "audit_only": false
+  },
+  "model_configuration": {
+    "dataset_code": "ml-1m",
+    "num_items": 3706,
+    "bert_max_len": 200,
+    "bert_hidden_units": 64,
+    "bert_num_blocks": 2,
+    "bert_dropout": 0.2,
+    "bert_attn_dropout": 0.2
+  },
+  "model_parameters": 341691,
+  "population": {
+    "train_users": 6035,
+    "val_users": 6035,
+    "test_users": 6035,
+    "n_items": 3706
+  },
+  "threshold": 4,
+  "candidate_policy": "全部已评分电影词表；不按训练出现次数额外过滤；未训练物品保留并记录",
+  "filter_policy": "val:全部train评分；test:全部train+val评分；final:全部train+val+test评分",
+  "time_limitation": "沿用共享划分；低分train记录可能晚于留出正例；本模型只用训练正例建序列，过滤仍按共享split定义。",
+  "train_policy": "训练正例序列；相邻下一项交叉熵；窗口length+1、stride=length；不伪造验证项",
+  "tie_policy": "分数相同时按连续item编号升序（原MovieID升序）",
+  "input_sha256": {
+    "train": "1071a64f4ae573c658f4a11497562e98205dbf0edfd6bbc872653385d4c654fb",
+    "val": "825f652312ec2b1ce980766d213e7799065830b56e88dfbaed4249df78d2c33a",
+    "test": "8fb04c76645ffd2d61a212d4728d410615b2d26d8682c217d2bb9da1891b195c"
+  },
+  "n_items_without_train_positive": 181,
+  "train_and_validation_seconds": 437.59188112100014,
+  "best_epoch": 38,
+  "completed_epochs": 48,
+  "test_seconds": 3.422801513999957,
+  "status": "completed",
+  "checkpoint_sha256": "db58f90b535604cde1f1aa4052a2679df52ff7be1d8ee6a94bb5ec87e576d9c7"
+}

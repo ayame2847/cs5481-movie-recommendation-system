@@ -1,0 +1,6 @@
+{
+  "train_users": 6035,
+  "val_users": 6035,
+  "test_users": 6035,
+  "n_items": 3706
+}

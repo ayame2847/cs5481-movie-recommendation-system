@@ -5,7 +5,8 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 ## 目前进度
 
 - **已完成（A：数据部分）**：数据集信息提取、EDA 可视化、清洗与特征编码、统一 leave-one-out 划分，全部脚本已跑通并通过校验，结果见 `results/`，报告草稿见 `reports/A_data_report.md`。
-- **待做**：三个算法（课堂 MF / 参考 BPR / 近期 LRURec）训练调参、统一评估（Recall@10、NDCG@10）、推荐结果对比、展示界面、最终报告与 5 分钟展示。
+- **已完成（LRURec）**：完成项目数据适配、单配置训练、验证集选模、统一过滤与逐用户测试评估，以及测试/最终展示两类推荐导出。测试6035名用户，Recall@10为0.243413，NDCG@10为0.128483；见 [运行说明](docs/LRURec运行说明.md) 和 [实验记录](docs/实验记录_lrurec.md)。
+- **待做**：MF、BPR的实现与同口径评估，三个算法的推荐结果对比、展示界面、最终报告与5分钟展示。LRURec当前只有单种子固定配置结果，后续比较须对齐用户范围和候选集合。
 
 ## 要做什么
 
@@ -67,7 +68,7 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - 语言：Python 3（已在 Windows + Python 3.x 实际跑通上述三条命令）。
 - 依赖：`requirements.txt`（pandas / numpy / matplotlib / pyyaml）。
 - 输入：`ml-1m/` 下三个 `.dat` 文件；输出：`results/tables/`、`results/figures/`、`data/processed/`。
-- 算法训练、评估与展示命令待对应模块实现后补充。
+- LRURec使用CUDA GPU，依赖与训练命令见 [LRURec运行说明](docs/LRURec运行说明.md)，Colab过程见 [`notebooks/cs5481_LRURec.ipynb`](notebooks/cs5481_LRURec.ipynb)。MF、BPR和交互展示命令待实现后补充。
 
 ## 统一实验口径（三个算法必须共用）
 
@@ -86,10 +87,13 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - 结果表：[`results/tables/`](results/tables/)（01–06 数据集信息表、07 EDA 摘要、08 清洗对比、09 划分统计）
 - 结果图：[`results/figures/`](results/figures/)（评分分布、用户活跃度、电影长尾、时间趋势、类型、人口统计）
 - A 部分报告草稿：[`reports/A_data_report.md`](reports/A_data_report.md)
-- 算法评估结果与推荐对比：待实验后补充，不把计划当结果。
+- LRURec测试指标：[`results/tables/10_lrurec_metrics.csv`](results/tables/10_lrurec_metrics.csv)。
+- 测试场景推荐：[`results/tables/11_lrurec_test_top5.csv`](results/tables/11_lrurec_test_top5.csv)；最终展示推荐：[`results/tables/12_lrurec_final_top5.csv`](results/tables/12_lrurec_final_top5.csv)。
+- 用户范围、逐用户测试结果、验证历史和运行元数据：[`results/lrurec/`](results/lrurec/)。跨算法结果对比待MF、BPR完成后补充。
 
 ## 数据来源与引用
 
 数据来源：F. Maxwell Harper and Joseph A. Konstan. 2015. *The MovieLens Datasets: History and Context*. ACM Transactions on Interactive Intelligent Systems, 5(4), Article 19. [https://doi.org/10.1145/2827872](https://doi.org/10.1145/2827872)
 
 数据页面：[MovieLens 1M](https://grouplens.org/datasets/movielens/1m/)。原始数据不随本仓库提交或再分发。采用论文和第三方实现后，在报告中补充对应引用及修改说明。
+
