@@ -3,7 +3,7 @@
 - `tables/`：整理后的评价结果和推荐对比表。
 - `figures/`：数据分布、算法对比和推荐示例图。
 
-目前没有实验结果，子目录中的 `.gitkeep` 仅用于保留目录。
+LRURec 的运行元数据与逐用户评估见 [lrurec/](lrurec/)。BPR 的[验证与测试指标](tables/bpr_metrics.csv)和[两位用户的推荐](tables/bpr_recommendations.csv)由 `python src/bpr.py train` 生成。
 
 提交结果时，附上对应实验记录、配置、代码提交编号和生成方法。表格注明指标、数据划分和算法名称；图注明标题、坐标和单位（如适用）。不要填写没有实际跑出的数值。
 

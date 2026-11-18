@@ -21,3 +21,10 @@ files:
   ratings: ratings.dat
   users: users.dat
   movies: movies.dat
+
+bpr:
+  factors: [32, 64]
+  validate_at: [10, 20, 30]
+  learning_rate: 0.05
+  regularization: 0.0025
+  batch_size: 512

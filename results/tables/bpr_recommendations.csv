@@ -1,0 +1,11 @@
+user_id,rank,MovieID,Title,Genres,bpr_score
+1,1,364,"Lion King, The (1994)",Animation|Children's|Musical,6.465136
+1,2,2085,101 Dalmatians (1961),Animation|Children's,5.426738
+1,3,34,Babe (1995),Children's|Comedy|Drama,5.335232
+1,4,2080,Lady and the Tramp (1955),Animation|Children's|Comedy|Musical|Romance,5.227762
+1,5,1282,Fantasia (1940),Animation|Children's|Musical,5.180502
+42,1,1676,Starship Troopers (1997),Action|Adventure|Sci-Fi|War,6.359355
+42,2,592,Batman (1989),Action|Adventure|Crime|Drama,5.864150
+42,3,1370,Die Hard 2 (1990),Action|Thriller,5.656133
+42,4,2944,"Dirty Dozen, The (1967)",Action|War,5.466799
+42,5,2028,Saving Private Ryan (1998),Action|Drama|War,5.436195
