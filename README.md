@@ -6,7 +6,8 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 
 - **已完成（A：数据部分）**：数据集信息提取、EDA 可视化、清洗与特征编码、统一 leave-one-out 划分，全部脚本已跑通并通过校验，结果见 `results/`，报告草稿见 `reports/A_data_report.md`。
 - **已完成（LRURec）**：完成项目数据适配、单配置训练、验证集选模、统一过滤与逐用户测试评估，以及测试/最终展示两类推荐导出。测试6035名用户，Recall@10为0.243413，NDCG@10为0.128483；见 [运行说明](docs/LRURec运行说明.md) 和 [实验记录](docs/实验记录_lrurec.md)。
-- **待做**：MF、BPR的实现与同口径评估，三个算法的推荐结果对比、展示界面、最终报告与5分钟展示。LRURec当前只有单种子固定配置结果，后续比较须对齐用户范围和候选集合。
+- **已完成（MF）**：基于 A 的统一数据实现带偏置矩阵分解，验证集选择 32 维、正则化 10、3 轮。测试 6035 名用户，Recall@10 为 0.042088，NDCG@10 为 0.022095；见 [运行说明](docs/MF运行说明.md)、[实验记录](docs/实验记录_mf.md) 和 [报告](reports/B_MF_report.md)。
+- **待做**：BPR 的同口径评估与整合（实现见 PR #1），三个算法的推荐结果对比、展示界面、最终报告与5分钟展示。LRURec当前只有单种子固定配置结果，后续比较须对齐用户范围和候选集合。
 
 ## 要做什么
 
@@ -68,7 +69,7 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - 语言：Python 3（已在 Windows + Python 3.x 实际跑通上述三条命令）。
 - 依赖：`requirements.txt`（pandas / numpy / matplotlib / pyyaml）。
 - 输入：`ml-1m/` 下三个 `.dat` 文件；输出：`results/tables/`、`results/figures/`、`data/processed/`。
-- LRURec使用CUDA GPU，依赖与训练命令见 [LRURec运行说明](docs/LRURec运行说明.md)，Colab过程见 [`notebooks/cs5481_LRURec.ipynb`](notebooks/cs5481_LRURec.ipynb)。MF、BPR和交互展示命令待实现后补充。
+- LRURec使用CUDA GPU，依赖与训练命令见 [LRURec运行说明](docs/LRURec运行说明.md)，Colab过程见 [`notebooks/cs5481_LRURec.ipynb`](notebooks/cs5481_LRURec.ipynb)。MF 使用 CPU，依赖与训练、交互推荐命令见 [MF运行说明](docs/MF运行说明.md)。BPR 和最终展示界面的整合待完成。
 
 ## 统一实验口径（三个算法必须共用）
 
@@ -89,7 +90,11 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - A 部分报告草稿：[`reports/A_data_report.md`](reports/A_data_report.md)
 - LRURec测试指标：[`results/tables/10_lrurec_metrics.csv`](results/tables/10_lrurec_metrics.csv)。
 - 测试场景推荐：[`results/tables/11_lrurec_test_top5.csv`](results/tables/11_lrurec_test_top5.csv)；最终展示推荐：[`results/tables/12_lrurec_final_top5.csv`](results/tables/12_lrurec_final_top5.csv)。
-- 用户范围、逐用户测试结果、验证历史和运行元数据：[`results/lrurec/`](results/lrurec/)。跨算法结果对比待MF、BPR完成后补充。
+- 用户范围、逐用户测试结果、验证历史和运行元数据：[`results/lrurec/`](results/lrurec/)。
+
+- MF 测试指标：[mf_metrics.csv](results/tables/mf_metrics.csv)；[测试推荐](results/tables/mf_test_top5.csv)、[最终展示推荐](results/tables/mf_final_top5.csv)。
+- MF 验证历史、逐用户结果和元数据：[results/mf/](results/mf/)；报告：[B_MF_report.md](reports/B_MF_report.md)。
+- [MF / LRURec 对比](results/tables/mf_lrurec_comparison.csv)使用相同用户、候选集合和过滤规则，但训练信号及测试时验证项上下文不同。共享划分可能保留晚于目标的低分训练记录，不能视为严格时间回测；详见 MF 报告。BPR 对比需先对齐口径。
 
 ## 数据来源与引用
 
