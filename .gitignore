@@ -44,6 +44,7 @@ node_modules/
 *.pkl
 *.pickle
 *.joblib
+*.npz
 
 # 构建和本地临时文件
 /build/

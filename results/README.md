@@ -3,8 +3,10 @@
 - `tables/`：整理后的评价结果和推荐对比表。
 - `figures/`：数据分布、算法对比和推荐示例图。
 
-LRURec 的运行元数据与逐用户评估见 [lrurec/](lrurec/)。BPR 的[验证与测试指标](tables/bpr_metrics.csv)和[两位用户的推荐](tables/bpr_recommendations.csv)由 `python src/bpr.py train` 生成。
+`tables/` 和 `figures/` 保存 A 部分结果；`lrurec/`、`mf/` 保存相应算法的详细记录。MF 指标与推荐表以 `tables/mf_` 开头，实验配置和复现过程见 `docs/实验记录_mf.md`。
 
 提交结果时，附上对应实验记录、配置、代码提交编号和生成方法。表格注明指标、数据划分和算法名称；图注明标题、坐标和单位（如适用）。不要填写没有实际跑出的数值。
 
 原始日志、大体积中间文件和模型权重放本地 `runs/`、`logs/` 或 `checkpoints/`，这些目录默认不提交。
+
+BPR的独立实验指标和推荐示例见 `tables/bpr_metrics.csv`、`tables/bpr_recommendations.csv`。其6038名测试用户和候选范围与MF/LRURec不同，正式对比前需统一并重新验证选模及测试。

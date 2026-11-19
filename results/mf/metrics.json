@@ -1,0 +1,104 @@
+{
+  "algorithm": "biased_explicit_matrix_factorisation_ALS",
+  "status": "shared_split_completed",
+  "team_reference_commit": "417d758ebe439c4a9a842c0d16503b0c8b1ff480",
+  "seed": 42,
+  "threshold": 4.0,
+  "selected": {
+    "trial": 2,
+    "factors": 32,
+    "regularisation": 10.0,
+    "epoch": 3
+  },
+  "selection_metric": "validation Recall@10; exact ties retain earlier trial/epoch",
+  "declared_grid": [
+    {
+      "factors": 16,
+      "regularisation": 10.0
+    },
+    {
+      "factors": 32,
+      "regularisation": 10.0
+    },
+    {
+      "factors": 32,
+      "regularisation": 30.0
+    }
+  ],
+  "maximum_epochs": 20,
+  "patience": 5,
+  "training_rows": 988134,
+  "training_users": 6040,
+  "validation_users": 6035,
+  "test_users": 6035,
+  "catalogue_items": 3706,
+  "training_policy": "All original train ratings, including low ratings; observed-only squared loss with L2 on biases and factors",
+  "frozen_model": "No validation/test ratings enter fitting; no refit after selection",
+  "candidate_policy": "\u5168\u90e8\u5df2\u8bc4\u5206\u7535\u5f71\u8bcd\u8868\uff1b\u4e0d\u6309\u8bad\u7ec3\u51fa\u73b0\u6b21\u6570\u989d\u5916\u8fc7\u6ee4\uff1b\u672a\u8bad\u7ec3\u7269\u54c1\u4fdd\u7559\u5e76\u8bb0\u5f55",
+  "filter_policy": "val:\u5168\u90e8train\u8bc4\u5206\uff1btest:\u5168\u90e8train+val\u8bc4\u5206\uff1bfinal:\u5168\u90e8train+val+test\u8bc4\u5206",
+  "tie_policy": "Exact equal scores ordered by original MovieID ascending",
+  "time_limitation": "Shared train contains low ratings later than some held-out positives; MF fits these ratings. Not a strict temporal backtest.",
+  "comparison_limitation": "LRURec uses train-positive sequences plus validation context for test; MF uses all train ratings with frozen user vectors. Single seeds; unequal tuning budgets.",
+  "input_sha256": {
+    "train": "1071a64f4ae573c658f4a11497562e98205dbf0edfd6bbc872653385d4c654fb",
+    "val": "825f652312ec2b1ce980766d213e7799065830b56e88dfbaed4249df78d2c33a",
+    "test": "8fb04c76645ffd2d61a212d4728d410615b2d26d8682c217d2bb9da1891b195c"
+  },
+  "movies_metadata_sha256": "74d2ec6f8a9b625491b9b59d8897382fffd6c5545321a3e993d75c6dc36ded09",
+  "reference_metadata_sha256": "27e8600104d0bef0298395bfe27273d1c7b7d216eec8661546aae35b82e6007f",
+  "reference_metrics_sha256": "f278b6cd41ca2aa7635bdabeb92611c303b25f65c8a246a9e8305c6ca5bc8361",
+  "test_metrics": {
+    "Recall@1": 0.007787903893951947,
+    "NDCG@1": 0.007787903893951947,
+    "MRR@1": 0.007787903893951947,
+    "Recall@5": 0.026346313173156586,
+    "NDCG@5": 0.017090757718083976,
+    "MRR@5": 0.014059652029826014,
+    "Recall@10": 0.04208782104391052,
+    "NDCG@10": 0.022094503578398726,
+    "MRR@10": 0.016073631330466458,
+    "Recall@20": 0.06379453189726594,
+    "NDCG@20": 0.027537267868534734,
+    "MRR@20": 0.017544997329721885,
+    "Recall@50": 0.11980115990057995,
+    "NDCG@50": 0.03850843236271923,
+    "MRR@50": 0.0192483823765739
+  },
+  "validation_selection_recall10": 0.0463960231980116,
+  "training_validation_seconds": 16.138810084001307,
+  "test_seconds": 0.2377277919986227,
+  "checkpoint_sha256": "000216d459b638f151df70c9828644a00dffbbddaff7616361aa4806d38d0840",
+  "experiment_config": {
+    "maximum_epochs": 20,
+    "patience": 5,
+    "trials": [
+      {
+        "factors": 16,
+        "regularisation": 10.0
+      },
+      {
+        "factors": 32,
+        "regularisation": 10.0
+      },
+      {
+        "factors": 32,
+        "regularisation": 30.0
+      }
+    ]
+  },
+  "experiment_config_sha256": "95db1e06b3c2ea9f66baa63cb0cd447d0ecebfb274f83735c208e84c6390bb8b",
+  "source_sha256": {
+    "src/mf.py": "1e949b786f34fb75da8e7e176813fa2c50ed04b1046866bf279673581e6096f0",
+    "src/run_mf.py": "0b87938d5d0e7888134ae1e820a49e50736f51ff65f09b8675cb577647c1b514",
+    "src/mf_demo.py": "ad4d20fa9c9c26978c1594d92f39c780c10e1540fc0db8fe5b71bc39350cc304",
+    "requirements-mf.txt": "58719edf863ae6111be2f9cf34e7218edb169108da8c71ea66c7521de5224f1a"
+  },
+  "versions": {
+    "python": "3.11.15",
+    "numpy": "2.2.6",
+    "pandas": "2.2.3",
+    "scipy": "1.15.3",
+    "PyYAML": "6.0.2"
+  },
+  "execution": "CPU; BLAS thread limits set to one"
+}
