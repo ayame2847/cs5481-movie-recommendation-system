@@ -1,0 +1,26 @@
+UserID,rank,MovieID,Title,Genres,score
+1,1,904,Rear Window (1954),Mystery|Thriller,4.677786470102852
+1,2,318,"Shawshank Redemption, The (1994)",Drama,4.673961895961491
+1,3,1250,"Bridge on the River Kwai, The (1957)",Drama|War,4.63204296772226
+1,4,2324,Life Is Beautiful (La Vita è bella) (1997),Comedy|Drama,4.620508029139134
+1,5,858,"Godfather, The (1972)",Action|Crime|Drama,4.608500370817909
+2,1,527,Schindler's List (1993),Drama|War,4.938728528514669
+2,2,953,It's a Wonderful Life (1946),Drama,4.9207094847468085
+2,3,2324,Life Is Beautiful (La Vita è bella) (1997),Comedy|Drama,4.816613695405071
+2,4,1270,Back to the Future (1985),Comedy|Sci-Fi,4.7713897834498695
+2,5,1721,Titanic (1997),Drama|Romance,4.74417702451157
+3,1,2329,American History X (1998),Drama,4.614364453751497
+3,2,318,"Shawshank Redemption, The (1994)",Drama,4.59651899892996
+3,3,1954,Rocky (1976),Action|Drama,4.588989848152384
+3,4,1234,"Sting, The (1973)",Comedy|Crime,4.584382972176413
+3,5,3508,"Outlaw Josey Wales, The (1976)",Western,4.577361899743971
+4,1,858,"Godfather, The (1972)",Action|Crime|Drama,4.974140700399447
+4,2,527,Schindler's List (1993),Drama|War,4.887859859917572
+4,3,912,Casablanca (1942),Drama|Romance|War,4.830495169834705
+4,4,1221,"Godfather: Part II, The (1974)",Action|Crime|Drama,4.794226704926918
+4,5,593,"Silence of the Lambs, The (1991)",Drama|Thriller,4.784300493548926
+5,1,1348,"Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)",Horror,4.847725873659341
+5,2,912,Casablanca (1942),Drama|Romance|War,4.8473493135775225
+5,3,923,Citizen Kane (1941),Drama,4.626091081690754
+5,4,3435,Double Indemnity (1944),Crime|Film-Noir,4.600588459767039
+5,5,1256,Duck Soup (1933),Comedy|War,4.59294845733871

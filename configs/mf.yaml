@@ -1,0 +1,11 @@
+# Explicit-rating MF: validation Recall@10 selects the trial and epoch.
+# Seed, relevance threshold and data paths come from configs/config.yaml.
+maximum_epochs: 20
+patience: 5
+trials:
+  - factors: 16
+    regularisation: 10.0
+  - factors: 32
+    regularisation: 10.0
+  - factors: 32
+    regularisation: 30.0

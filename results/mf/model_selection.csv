@@ -1,0 +1,4 @@
+trial,factors,regularisation,best_epoch,completed_epochs,best_validation_Recall@10
+1,16,10.0,4,9,0.04523612261806131
+2,32,10.0,3,8,0.0463960231980116
+3,32,30.0,4,9,0.04374482187241094
