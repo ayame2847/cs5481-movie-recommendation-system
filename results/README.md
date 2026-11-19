@@ -9,4 +9,4 @@
 
 原始日志、大体积中间文件和模型权重放本地 `runs/`、`logs/` 或 `checkpoints/`，这些目录默认不提交。
 
-BPR的独立实验指标和推荐示例见 `tables/bpr_metrics.csv`、`tables/bpr_recommendations.csv`。其6038名测试用户和候选范围与MF/LRURec不同，正式对比前需统一并重新验证选模及测试。
+BPR 的独立实验见 [指标](tables/bpr_metrics.csv)和[推荐示例](tables/bpr_recommendations.csv)。组内比较使用 [同口径验证](tables/bpr_shared_validation.csv)和[同口径测试](tables/bpr_shared_metrics.csv)，由 `python src/bpr.py train --shared` 生成。共同口径来自 LRURec 的用户资格表与电影映射，验证和测试各 6,035 人，电影词表 3,706 部。
