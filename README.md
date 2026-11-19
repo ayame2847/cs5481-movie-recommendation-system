@@ -7,7 +7,8 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - **已完成（A：数据部分）**：数据集信息提取、EDA 可视化、清洗与特征编码、统一 leave-one-out 划分，全部脚本已跑通并通过校验，结果见 `results/`，报告草稿见 `reports/A_data_report.md`。
 - **已完成（LRURec）**：完成项目数据适配、单配置训练、验证集选模、统一过滤与逐用户测试评估，以及测试/最终展示两类推荐导出。测试6035名用户，Recall@10为0.243413，NDCG@10为0.128483；见 [运行说明](docs/LRURec运行说明.md) 和 [实验记录](docs/实验记录_lrurec.md)。
 - **已完成（MF）**：基于 A 的统一数据实现带偏置矩阵分解，验证集选择 32 维、正则化 10、3 轮。测试 6035 名用户，Recall@10 为 0.042088，NDCG@10 为 0.022095；见 [运行说明](docs/MF运行说明.md)、[实验记录](docs/实验记录_mf.md) 和 [报告](reports/B_MF_report.md)。
-- **待做**：BPR 的同口径评估与整合（实现见 PR #1），三个算法的推荐结果对比、展示界面、最终报告与5分钟展示。LRURec当前只有单种子固定配置结果，后续比较须对齐用户范围和候选集合。
+- **已完成（BPR 独立实验）**：完成 BPR-MF 训练、验证集 NDCG@10 选模和用户推荐。当前测试6038名用户，Recall@10为0.089268、NDCG@10为0.045793；评估用户及候选范围尚未与MF/LRURec统一，不能直接比较数值。见 [BPR实验报告](reports/BPR_实验报告.pdf)。
+- **待做**：BPR 的同口径评估，三个算法的推荐结果对比、展示界面、最终报告与5分钟展示。LRURec当前只有单种子固定配置结果，后续比较须对齐用户范围和候选集合。
 
 ## 要做什么
 
@@ -69,7 +70,7 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - 语言：Python 3（已在 Windows + Python 3.x 实际跑通上述三条命令）。
 - 依赖：`requirements.txt`（pandas / numpy / matplotlib / pyyaml）。
 - 输入：`ml-1m/` 下三个 `.dat` 文件；输出：`results/tables/`、`results/figures/`、`data/processed/`。
-- LRURec使用CUDA GPU，依赖与训练命令见 [LRURec运行说明](docs/LRURec运行说明.md)，Colab过程见 [`notebooks/cs5481_LRURec.ipynb`](notebooks/cs5481_LRURec.ipynb)。MF 使用 CPU，依赖与训练、交互推荐命令见 [MF运行说明](docs/MF运行说明.md)。BPR 和最终展示界面的整合待完成。
+- LRURec使用CUDA GPU，依赖与训练命令见 [LRURec运行说明](docs/LRURec运行说明.md)，Colab过程见 [`notebooks/cs5481_LRURec.ipynb`](notebooks/cs5481_LRURec.ipynb)。MF 使用 CPU，依赖与训练、交互推荐命令见 [MF运行说明](docs/MF运行说明.md)。BPR运行方法见下文；最终展示界面待整合。
 
 ## 统一实验口径（三个算法必须共用）
 
@@ -102,3 +103,19 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 
 数据页面：[MovieLens 1M](https://grouplens.org/datasets/movielens/1m/)。原始数据不随本仓库提交或再分发。采用论文和第三方实现后，在报告中补充对应引用及修改说明。
 
+
+## BPR 运行与比较限制
+
+在根目录完成预处理后运行：
+
+```bash
+python src/bpr.py train
+python src/bpr.py recommend --user 1 --top-k 5
+python src/bpr.py recommend --user 42 --top-k 5
+```
+
+BPR使用NumPy、pandas和PyYAML，在CPU运行；参数见 `configs/config.yaml` 的 `bpr` 段。种子42用于初始化及抽样，以验证集NDCG@10选择维度和轮次。权重在本地 `artifacts/bpr.npz`，不提交仓库。推荐过滤全部已评分电影。CSV被WPS/Excel占用时另存带时间戳的副本，以终端显示路径为准。
+
+[验证与测试指标](results/tables/bpr_metrics.csv)、[推荐示例](results/tables/bpr_recommendations.csv)、[实验报告](reports/BPR_实验报告.pdf)。BPR当前候选电影来自电影特征表，测试6038人；MF/LRURec使用3706部已评分电影和6035名共同有效用户。因此BPR这些结果保留为独立实验，须统一用户、候选和过滤规则并重做验证选模后，才能加入正式三算法对比。不要只把539次命中改用6035作分母。
+
+BPR论文：Steffen Rendle、Christoph Freudenthaler、Zeno Gantner、Lars Schmidt-Thieme，[*BPR: Bayesian Personalized Ranking from Implicit Feedback*](https://arxiv.org/abs/1205.2618)，UAI 2009。
