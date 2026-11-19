@@ -2,6 +2,8 @@
 
 import argparse
 from datetime import datetime
+from hashlib import sha256
+import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import perf_counter
@@ -9,12 +11,15 @@ from time import perf_counter
 import numpy as np
 import pandas as pd
 
-from config import CFG, PROCESSED_DIR, ROOT, SEED, TABLES_DIR
+from config import CFG, POSITIVE_THRESHOLD, PROCESSED_DIR, ROOT, SEED, TABLES_DIR
 
 
 MODEL_PATH = ROOT / "artifacts" / "bpr.npz"
+SHARED_MODEL_PATH = ROOT / "artifacts" / "bpr_shared.npz"
+LRUREC_RESULTS = ROOT / "results" / "lrurec"
 SAMPLE_USERS = [1, 42]
 K = 10
+SHARED_KS = (1, 5, 10, 20, 50)
 BPR_CONFIG = CFG["bpr"]
 BATCH_SIZE = BPR_CONFIG["batch_size"]
 LEARNING_RATE = BPR_CONFIG["learning_rate"]
@@ -92,11 +97,11 @@ class BPR:
         return loss / n_pairs
 
 
-def evaluate(user_factors, item_factors, seen, users, targets):
+def target_ranks(user_factors, item_factors, seen, users, targets):
     """One positive per user. Ties go to the smaller MovieID."""
     if len(users) == 0 or len(np.unique(users)) != len(users) or seen[users, targets].any():
         raise ValueError("Expected one unmasked held-out movie per evaluation user")
-    hits, dcg = 0, 0.0
+    ranks = np.empty(len(users), dtype=np.int64)
     movie_indices = np.arange(len(item_factors))
     for start in range(0, len(users), 256):
         batch = slice(start, start + 256)
@@ -107,12 +112,59 @@ def evaluate(user_factors, item_factors, seen, users, targets):
         ahead = (scores > target_scores) | (
             (scores == target_scores) & (movie_indices < batch_targets[:, None])
         )
-        ranks = 1 + ahead.sum(axis=1)
-        top = ranks <= K
-        hits += int(top.sum())
-        dcg += float((1 / np.log2(ranks[top] + 1)).sum())
-    return {"users": len(users), "hits_at_10": hits, "recall_at_10": hits / len(users),
-            "ndcg_at_10": dcg / len(users)}
+        ranks[batch] = 1 + ahead.sum(axis=1)
+    return ranks
+
+
+def ranking_metrics(ranks, k):
+    top_ranks = ranks[ranks <= k]
+    return {
+        f"hits_at_{k}": len(top_ranks),
+        f"recall_at_{k}": len(top_ranks) / len(ranks),
+        f"ndcg_at_{k}": float((1 / np.log2(top_ranks + 1)).sum() / len(ranks)),
+        f"mrr_at_{k}": float((1 / top_ranks).sum() / len(ranks)),
+    }
+
+
+def metrics_at_10(ranks):
+    metrics = ranking_metrics(ranks, K)
+    del metrics["mrr_at_10"]
+    return {"users": len(ranks), **metrics}
+
+
+def evaluate(user_factors, item_factors, seen, users, targets):
+    ranks = target_ranks(user_factors, item_factors, seen, users, targets)
+    return metrics_at_10(ranks)
+
+
+def load_shared_evaluation(data):
+    """Read LRURec's committed cohort and catalogue for the same split."""
+    reference = json.loads((LRUREC_RESULTS / "run_metadata.json").read_text(encoding="utf-8"))
+    for split in ("train", "val", "test"):
+        contents = (PROCESSED_DIR / f"{split}.csv").read_bytes()
+        # A's generated CSVs may use CRLF on Windows and LF on Colab.
+        if sha256(contents.replace(b"\r\n", b"\n")).hexdigest() != reference["input_sha256"][split]:
+            raise ValueError(f"{split}.csv differs from the LRURec evaluation split")
+    if SEED != reference["seed"] or POSITIVE_THRESHOLD != reference["threshold"]:
+        raise ValueError("Seed or relevance threshold differs from the LRURec run")
+
+    mapping = json.loads((LRUREC_RESULTS / "item_mapping.json").read_text(encoding="utf-8"))
+    movie_ids = [int(movie_id) for movie_id in mapping]
+    candidate_movies = data.movies.index.isin(movie_ids)
+    population = pd.read_csv(
+        LRUREC_RESULTS / "user_population.csv",
+        usecols=["UserID", "val_eligible", "test_eligible"],
+        dtype={"val_eligible": "boolean", "test_eligible": "boolean"},
+    ).set_index("UserID", verify_integrity=True).sort_index()
+    if not population.index.equals(data.users) or population.isna().any().any():
+        raise ValueError("LRURec population does not match the preprocessed user table")
+    val_users = population["val_eligible"].to_numpy(dtype=bool)
+    test_users = population["test_eligible"].to_numpy(dtype=bool)
+    counts = reference["population"]
+    if (candidate_movies.sum() != len(movie_ids) or len(movie_ids) != counts["n_items"]
+            or val_users.sum() != counts["val_users"] or test_users.sum() != counts["test_users"]):
+        raise ValueError("LRURec cohort or catalogue differs from the recorded experiment")
+    return candidate_movies, val_users, test_users
 
 
 def recommendations(data, user_factors, item_factors, seen, userid, k):
@@ -130,13 +182,27 @@ def recommendations(data, user_factors, item_factors, seen, userid, k):
     return table
 
 
-def train(data):
+def train(data, shared=False):
     train_users, train_movies, labels = data.read("train")
     val_users, val_movies, val_labels = data.read("val")
     seen = data.mask(train_users, train_movies)
     positives = data.mask(train_users[labels], train_movies[labels])
+    val_eligible = val_labels
+    selection_metric = "ndcg_at_10"
+    model_path = MODEL_PATH
+    if shared:
+        candidates, shared_val, shared_test = load_shared_evaluation(data)
+        seen[:, ~candidates] = True
+        val_eligible = val_labels & shared_val[val_users]
+        if val_eligible.sum() != shared_val.sum():
+            raise ValueError("LRURec validation cohort is missing a BPR target")
+        selection_metric = "recall_at_10"
+        model_path = SHARED_MODEL_PATH
+        print(f"Shared evaluation: {val_eligible.sum()} validation users, "
+              f"{shared_test.sum()} test users, {candidates.sum()} catalogue movies. "
+              "Selecting by validation Recall@10.", flush=True)
     metrics = []
-    best_ndcg = -np.inf
+    best_score = -np.inf
     for dimensions in DIMENSIONS:
         model = BPR(positives, dimensions, SEED)
         training_seconds = 0.0
@@ -148,7 +214,7 @@ def train(data):
                 continue
             result = evaluate(
                 model.user_factors, model.item_factors, seen,
-                val_users[val_labels], val_movies[val_labels],
+                val_users[val_eligible], val_movies[val_eligible],
             )
             metrics.append({
                 "split": "val", "factors": dimensions, "epoch": epoch,
@@ -158,25 +224,46 @@ def train(data):
             print(f"val  d={dimensions:2} epoch={epoch:2}  "
                   f"Recall@10={result['recall_at_10']:.4f}  NDCG@10={result['ndcg_at_10']:.4f}  "
                   f"train={training_seconds:.1f}s", flush=True)
-            if result["ndcg_at_10"] > best_ndcg:
-                best_ndcg = result["ndcg_at_10"]
+            if result[selection_metric] > best_score:
+                best_score = result[selection_metric]
                 best_row = metrics[-1]
                 best_users = model.user_factors.copy()
                 best_movies = model.item_factors.copy()
 
-    # The test file is read only after the configuration and checkpoint are fixed.
+    # Rank test targets only after the configuration and checkpoint are fixed.
     seen[val_users, val_movies] = True
     test_users, test_movies, test_labels = data.read("test")
-    test = evaluate(best_users, best_movies, seen, test_users[test_labels], test_movies[test_labels])
-    metrics.append({**best_row, "split": "test", **test})
+    test_eligible = test_labels
+    if shared:
+        test_eligible = test_labels & shared_test[test_users]
+        if test_eligible.sum() != shared_test.sum():
+            raise ValueError("LRURec test cohort is missing a BPR target")
+    ranks = target_ranks(
+        best_users, best_movies, seen, test_users[test_eligible], test_movies[test_eligible]
+    )
+    test = metrics_at_10(ranks)
     print(f"test d={best_row['factors']:2} epoch={best_row['epoch']:2}  "
           f"Recall@10={test['recall_at_10']:.4f}  NDCG@10={test['ndcg_at_10']:.4f}")
 
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    model_path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
-        MODEL_PATH, users=data.users.to_numpy(), movies=data.movies.index.to_numpy(),
+        model_path, users=data.users.to_numpy(), movies=data.movies.index.to_numpy(),
         user_factors=best_users, item_factors=best_movies,
     )
+    if shared:
+        result = {
+            "model": "BPR", "seed": SEED, "factors": best_row["factors"],
+            "epoch": best_row["epoch"], "users": len(ranks),
+            "candidate_movies": int(candidates.sum()),
+        }
+        for k in SHARED_KS:
+            result.update(ranking_metrics(ranks, k))
+        validation = pd.DataFrame(metrics).assign(candidate_movies=int(candidates.sum()))
+        save_table(validation, TABLES_DIR / "bpr_shared_validation.csv", "%.8f")
+        save_table(pd.DataFrame([result]), TABLES_DIR / "bpr_shared_metrics.csv", "%.8f")
+        return
+
+    metrics.append({**best_row, "split": "test", **test})
     save_table(pd.DataFrame(metrics), TABLES_DIR / "bpr_metrics.csv", "%.8f")
     seen[test_users, test_movies] = True
     samples = [
@@ -208,7 +295,11 @@ def save_table(frame, path, float_format):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("train", help="train, select by validation NDCG@10, and test")
+    training = commands.add_parser("train", help="train, validate, and test")
+    training.add_argument(
+        "--shared", action="store_true",
+        help="use LRURec's evaluation cohort and catalogue, selecting by validation Recall@10",
+    )
     recommend = commands.add_parser("recommend", help="rank movies the user has not rated")
     recommend.add_argument("--user", type=int, required=True, help="MovieLens UserID")
     recommend.add_argument("--top-k", type=int, default=5)
@@ -221,7 +312,7 @@ def main():
     try:
         data = MovieLensSplit()
         if args.command == "train":
-            train(data)
+            train(data, shared=args.shared)
             return
 
         with np.load(MODEL_PATH) as model:

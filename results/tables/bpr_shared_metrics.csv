@@ -1,0 +1,2 @@
+model,seed,factors,epoch,users,candidate_movies,hits_at_1,recall_at_1,ndcg_at_1,mrr_at_1,hits_at_5,recall_at_5,ndcg_at_5,mrr_at_5,hits_at_10,recall_at_10,ndcg_at_10,mrr_at_10,hits_at_20,recall_at_20,ndcg_at_20,mrr_at_20,hits_at_50,recall_at_50,ndcg_at_50,mrr_at_50
+BPR,42,64,30,6035,3706,89,0.01474731,0.01474731,0.01474731,329,0.05451533,0.03465734,0.02816901,539,0.08931234,0.04581568,0.03271991,909,0.15062138,0.06117901,0.03686557,1660,0.27506214,0.08575712,0.04076495

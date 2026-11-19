@@ -7,8 +7,8 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - **已完成（A：数据部分）**：数据集信息提取、EDA 可视化、清洗与特征编码、统一 leave-one-out 划分，全部脚本已跑通并通过校验，结果见 `results/`，报告草稿见 `reports/A_data_report.md`。
 - **已完成（LRURec）**：完成项目数据适配、单配置训练、验证集选模、统一过滤与逐用户测试评估，以及测试/最终展示两类推荐导出。测试6035名用户，Recall@10为0.243413，NDCG@10为0.128483；见 [运行说明](docs/LRURec运行说明.md) 和 [实验记录](docs/实验记录_lrurec.md)。
 - **已完成（MF）**：基于 A 的统一数据实现带偏置矩阵分解，验证集选择 32 维、正则化 10、3 轮。测试 6035 名用户，Recall@10 为 0.042088，NDCG@10 为 0.022095；见 [运行说明](docs/MF运行说明.md)、[实验记录](docs/实验记录_mf.md) 和 [报告](reports/B_MF_report.md)。
-- **已完成（BPR 独立实验）**：完成 BPR-MF 训练、验证集 NDCG@10 选模和用户推荐。当前测试6038名用户，Recall@10为0.089268、NDCG@10为0.045793；评估用户及候选范围尚未与MF/LRURec统一，不能直接比较数值。见 [BPR实验报告](reports/BPR_实验报告.pdf)。
-- **待做**：BPR 的同口径评估，三个算法的推荐结果对比、展示界面、最终报告与5分钟展示。LRURec当前只有单种子固定配置结果，后续比较须对齐用户范围和候选集合。
+- **已完成（BPR）**：完成 BPR-MF 独立实验与同口径验证、选模和测试。组内比较使用共同的 6,035 名用户和 3,706 部候选电影。见 [同口径指标](results/tables/bpr_shared_metrics.csv)和 [BPR 实验报告](reports/BPR_实验报告.pdf)。
+- **待做**：三个算法的推荐结果对比、展示界面、最终报告与 5 分钟展示。
 
 ## 要做什么
 
@@ -78,6 +78,7 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 - **划分**：leave-one-out，按用户正例时间排序，最后一次正例 → test（6,038 行）、倒数第二次 → val（6,037 行）、其余 → train（988,134 行）。
 - **防泄漏**：行为统计特征仅用 train 计算（示例：`train_item_popularity.csv`）；评估 val 过滤 train 已观察电影，评估 test 过滤 train+val；最终展示推荐过滤全部已观察电影；调参只用 val。
 - **评估指标**：Recall@10、NDCG@10，全量候选排序（评估脚本实现时固定候选集合并记录）。
+- **组内比较**：验证和测试各使用 6,035 名共同用户，候选词表为三个划分中有评分记录的 3,706 部电影。以验证 Recall@10 选模。验证过滤 train 评分，测试过滤 train + val 评分。三个模型各自使用其训练目标和用户历史表示。
 - 详细论证见 `reports/A_data_report.md`。
 
 ## 随机种子和实验复现
@@ -95,7 +96,7 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 
 - MF 测试指标：[mf_metrics.csv](results/tables/mf_metrics.csv)；[测试推荐](results/tables/mf_test_top5.csv)、[最终展示推荐](results/tables/mf_final_top5.csv)。
 - MF 验证历史、逐用户结果和元数据：[results/mf/](results/mf/)；报告：[B_MF_report.md](reports/B_MF_report.md)。
-- [MF / LRURec 对比](results/tables/mf_lrurec_comparison.csv)使用相同用户、候选集合和过滤规则，但训练信号及测试时验证项上下文不同。共享划分可能保留晚于目标的低分训练记录，不能视为严格时间回测；详见 MF 报告。BPR 对比需先对齐口径。
+- [MF / LRURec 对比](results/tables/mf_lrurec_comparison.csv)及 [BPR 同口径结果](results/tables/bpr_shared_metrics.csv)使用相同的评估用户、候选集合和过滤规则。共享划分可能保留晚于目标的低分训练记录，详见各算法报告。
 
 ## 数据来源与引用
 
@@ -104,18 +105,19 @@ CS5481 小组项目，使用 MovieLens 1M 数据集，为用户推荐没有评�
 数据页面：[MovieLens 1M](https://grouplens.org/datasets/movielens/1m/)。原始数据不随本仓库提交或再分发。采用论文和第三方实现后，在报告中补充对应引用及修改说明。
 
 
-## BPR 运行与比较限制
+## BPR 运行与同口径评估
 
 在根目录完成预处理后运行：
 
 ```bash
 python src/bpr.py train
+python src/bpr.py train --shared
 python src/bpr.py recommend --user 1 --top-k 5
 python src/bpr.py recommend --user 42 --top-k 5
 ```
 
-BPR使用NumPy、pandas和PyYAML，在CPU运行；参数见 `configs/config.yaml` 的 `bpr` 段。种子42用于初始化及抽样，以验证集NDCG@10选择维度和轮次。权重在本地 `artifacts/bpr.npz`，不提交仓库。推荐过滤全部已评分电影。CSV被WPS/Excel占用时另存带时间戳的副本，以终端显示路径为准。
+BPR 使用 NumPy、pandas 和 PyYAML，在 CPU 运行。参数见 `configs/config.yaml` 的 `bpr` 段，种子 42 用于初始化及抽样。独立实验按验证 NDCG@10 选模，输出 [独立指标](results/tables/bpr_metrics.csv)和[推荐示例](results/tables/bpr_recommendations.csv)。推荐命令加载 `artifacts/bpr.npz`，过滤用户的全部已评分电影。
 
-[验证与测试指标](results/tables/bpr_metrics.csv)、[推荐示例](results/tables/bpr_recommendations.csv)、[实验报告](reports/BPR_实验报告.pdf)。BPR当前候选电影来自电影特征表，测试6038人；MF/LRURec使用3706部已评分电影和6035名共同有效用户。因此BPR这些结果保留为独立实验，须统一用户、候选和过滤规则并重做验证选模后，才能加入正式三算法对比。不要只把539次命中改用6035作分母。
+`train --shared` 核对 LRURec 记录的数据指纹，读取其用户资格表和电影映射，再按共同口径重跑六个验证检查点。它用验证 Recall@10 选定检查点，对测试目标重新打分和排名。BPR 的正例训练、比较项抽样及参数网格沿用独立实验。结果见[同口径验证表](results/tables/bpr_shared_validation.csv)、[同口径测试表](results/tables/bpr_shared_metrics.csv)和[实验报告](reports/BPR_实验报告.pdf)。对齐后的权重保存到本地 `artifacts/bpr_shared.npz`。CSV 被 WPS 或 Excel 占用时，程序会显示另存的实际路径。
 
 BPR论文：Steffen Rendle、Christoph Freudenthaler、Zeno Gantner、Lars Schmidt-Thieme，[*BPR: Bayesian Personalized Ranking from Implicit Feedback*](https://arxiv.org/abs/1205.2618)，UAI 2009。
